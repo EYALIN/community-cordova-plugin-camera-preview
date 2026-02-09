@@ -1,10 +1,16 @@
 {
-  "name": "cordova-plugin-camera-preview",
-  "version": "0.14.0",
-  "description": "Cordova plugin that allows camera interaction from HTML code for showing camera preview below or on top of the HTML.",
+  "name": "community-cordova-plugin-camera-preview",
+  "version": "1.0.0",
+  "description": "Community Cordova Camera Preview Plugin - Camera interaction from HTML code with preview popup on top of the HTML",
+  "cordova": {
+    "id": "community-cordova-plugin-camera-preview",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
   "keywords": [
     "cordova",
-    "phonegap",
     "ecosystem:cordova",
     "cordova-android",
     "cordova-ios",
@@ -12,23 +18,17 @@
     "ios",
     "ionic",
     "camera",
-    "cam",
     "camera-preview",
     "preview"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/cordova-plugin-camera-preview/cordova-plugin-camera-preview"
+    "url": "https://github.com/eyalin/community-cordova-plugin-camera-preview"
   },
-  "author": {
-    "name": "Weston Ganger",
-    "email": "westonganger@gmail.com",
-    "url": "solidfoundationwebdev.com"
-  },
-  "license": "Apache 2.0",
-  "homepage": "https://github.com/cordova-plugin-camera-preview/cordova-plugin-camera-preview",
-  "typings": "typescript/CameraPreview.d.ts",
-  "dependencies": {
-  },
-  "devDependencies": {}
+  "author": "Community",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/eyalin/community-cordova-plugin-camera-preview",
+  "typings": "types/index.d.ts",
+  "types": "types/index.d.ts",
+  "main": "www/CameraPreviewPlugin.js"
 }
