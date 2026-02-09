@@ -67,7 +67,26 @@
 }
 
 - (AVCaptureVideoOrientation) getCurrentOrientation {
-  return [self getCurrentOrientation: [[UIApplication sharedApplication] statusBarOrientation]];
+  // Use windowScene's interfaceOrientation for iOS 13+
+  UIInterfaceOrientation orientation = UIInterfaceOrientationPortrait;
+  if (@available(iOS 13.0, *)) {
+    UIWindowScene *windowScene = nil;
+    for (UIScene *scene in [UIApplication sharedApplication].connectedScenes) {
+      if ([scene isKindOfClass:[UIWindowScene class]]) {
+        windowScene = (UIWindowScene *)scene;
+        break;
+      }
+    }
+    if (windowScene) {
+      orientation = windowScene.interfaceOrientation;
+    }
+  } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    orientation = [[UIApplication sharedApplication] statusBarOrientation];
+#pragma clang diagnostic pop
+  }
+  return [self getCurrentOrientation:orientation];
 }
 
 - (AVCaptureVideoOrientation) getCurrentOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
@@ -704,11 +723,39 @@
     if (!granted) {
       //Not granted access to mediaType
       dispatch_async(dispatch_get_main_queue(), ^{
-          [[[UIAlertView alloc] initWithTitle:@"Error"
-                                      message:@"Camera permission not found. Please, check your privacy settings."
-                                     delegate:self
-                            cancelButtonTitle:@"OK"
-                            otherButtonTitles:nil] show];
+          UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error"
+                                                                         message:@"Camera permission not found. Please, check your privacy settings."
+                                                                  preferredStyle:UIAlertControllerStyleAlert];
+          UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK"
+                                                             style:UIAlertActionStyleDefault
+                                                           handler:nil];
+          [alert addAction:okAction];
+
+          // Get root view controller using modern API
+          UIViewController *rootViewController = nil;
+          if (@available(iOS 13.0, *)) {
+            for (UIScene *scene in [UIApplication sharedApplication].connectedScenes) {
+              if ([scene isKindOfClass:[UIWindowScene class]]) {
+                UIWindowScene *windowScene = (UIWindowScene *)scene;
+                for (UIWindow *window in windowScene.windows) {
+                  if (window.isKeyWindow) {
+                    rootViewController = window.rootViewController;
+                    break;
+                  }
+                }
+                if (rootViewController) break;
+              }
+            }
+          } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+            rootViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
+#pragma clang diagnostic pop
+          }
+
+          if (rootViewController) {
+            [rootViewController presentViewController:alert animated:YES completion:nil];
+          }
       });
     }
   }];
@@ -716,10 +763,13 @@
 
 // Find a camera with the specified AVCaptureDevicePosition, returning nil if one is not found
 - (AVCaptureDevice *) cameraWithPosition:(AVCaptureDevicePosition) position {
-  NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
-  for (AVCaptureDevice *device in devices){
-    if ([device position] == position)
-      return device;
+  NSArray *deviceTypes = @[AVCaptureDeviceTypeBuiltInWideAngleCamera];
+  AVCaptureDeviceDiscoverySession *discoverySession = [AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:deviceTypes
+                                                                                                            mediaType:AVMediaTypeVideo
+                                                                                                             position:position];
+  NSArray *devices = discoverySession.devices;
+  if (devices.count > 0) {
+    return devices.firstObject;
   }
   return nil;
 }

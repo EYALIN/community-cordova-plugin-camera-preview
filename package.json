@@ -1,6 +1,6 @@
 {
   "name": "community-cordova-plugin-camera-preview",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Community Cordova Camera Preview Plugin - Camera interaction from HTML code with preview popup on top of the HTML",
   "cordova": {
     "id": "community-cordova-plugin-camera-preview",
