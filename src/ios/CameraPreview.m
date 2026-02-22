@@ -9,9 +9,8 @@
 @implementation CameraPreview
 
 -(void) pluginInitialize{
-  // start as transparent
-  self.webView.opaque = NO;
-  self.webView.backgroundColor = [UIColor clearColor];
+  // Don't make webview transparent on init - only when camera starts with toBack:true
+  // This prevents black background issues when the app loads
 }
 
 - (void) startCamera:(CDVInvokedUrlCommand*)command {
@@ -94,6 +93,12 @@
 
         self.cameraRenderController = nil;
         self.sessionManager = nil;
+
+        // Restore webview background to opaque white (fixes black background issue)
+        self.webView.opaque = YES;
+        self.webView.backgroundColor = [UIColor whiteColor];
+        self.webView.scrollView.opaque = YES;
+        self.webView.scrollView.backgroundColor = [UIColor whiteColor];
 
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     }
