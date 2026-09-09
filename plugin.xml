@@ -6,7 +6,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="community-cordova-plugin-camera-preview"
-        version="1.0.2">
+        version="1.0.3">
     <name>CameraPreviewPlugin</name>
     <description>Community Cordova Camera Preview Plugin - Camera interaction from HTML code with preview popup</description>
     <license>Apache 2.0</license>
@@ -35,9 +35,20 @@
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
         </config-file>
 
-        <config-file target="AndroidManifest.xml" parent="/manifest/application">
-            <activity android:name="com.cordovaplugincamerapreview.CameraActivity" android:screenOrientation="portrait" android:theme="@style/CameraPreviewTheme" />
-        </config-file>
+        <!--
+            CameraActivity is NOT an Activity — despite the name it `extends Fragment`, and
+            CameraPreview.java only ever uses it as one (`fragment = new CameraActivity()` added via
+            FragmentTransaction). Nothing starts it with an Intent.
+
+            Declaring it as <activity> made Android try to instantiate it as one when restoring the
+            task stack after process death, producing a hard crash:
+              java.lang.ClassCastException - com.cordovaplugincamerapreview.CameraActivity
+              cannot be cast to android.app.Activity
+            at android.app.AppComponentFactory.instantiateActivity.
+
+            The declaration was never needed — a Fragment must not be in the manifest — so it is
+            removed rather than "fixed". Do not re-add it.
+        -->
 
         <source-file src="src/android/CameraPreview.java" target-dir="src/com/cordovaplugincamerapreview" />
         <source-file src="src/android/CameraActivity.java" target-dir="src/com/cordovaplugincamerapreview" />
