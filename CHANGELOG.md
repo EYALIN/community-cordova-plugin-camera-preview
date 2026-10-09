@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.4 - 2026-09-26 (community fork)
+- Remove the bogus `CameraActivity` `<activity>` declaration from `plugin.xml` (it was a Fragment;
+  caused `ClassCastException` when launched externally). The removal landed in 15ddabd without a
+  version bump, so consuming apps' lockfiles kept 1.0.3 and never picked it up.
+
 ## MASTER BRANCH (RECOMMENDED) - UNRELEASED
 - [View Diff](https://github.com/cordova-plugin-camera-preview/cordova-plugin-camera-preview/compare/v0.14.0...master)
 - Nothing yet
